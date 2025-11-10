@@ -1,0 +1,112 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  background: #fefefe;
+  color: #222;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+#app {
+  width: 100%;
+  max-width: 600px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  background: white;
+  box-shadow: 0 0 12px rgba(0,0,0,0.05);
+}
+
+h1, h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.screen {
+  display: none;
+}
+
+.screen.active {
+  display: block;
+}
+
+button {
+  background-color: #007bff;
+  border: none;
+  color: white;
+  padding: 12px 20px;
+  margin: 10px 5px 0 0;
+  font-size: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+button.danger {
+  background-color: #dc3545;
+}
+
+button.danger:hover {
+  background-color: #a71d2a;
+}
+
+form label {
+  display: block;
+  margin-top: 15px;
+  font-weight: 600;
+}
+
+form select, form input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  font-size: 1rem;
+  margin-top: 6px;
+  box-sizing: border-box;
+}
+
+fieldset {
+  border: 1px solid #ccc;
+  margin-top: 20px;
+  padding: 10px 15px;
+  border-radius: 6px;
+}
+
+fieldset legend {
+  font-weight: bold;
+}
+
+#regular-toppings, #premium-toppings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.topping-option {
+  display: flex;
+  align-items: center;
+}
+
+.topping-option input[type="checkbox"] {
+  margin-right: 6px;
+}
+
+.topping-quantity {
+  margin-left: 6px;
+  width: 40px;
+}
+
+pre {
+  background: #eee;
+  padding: 15px;
+  border-radius: 6px;
+  max-height: 300px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: monospace;
+}

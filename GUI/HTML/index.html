@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Custom Food Shop</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- Home Screen -->
+    <section id="home-screen" class="screen active">
+      <h1>Welcome to Gourmet Bites</h1>
+      <button id="new-order-btn">New Order</button>
+      <button id="exit-btn">Exit</button>
+    </section>
+
+    <!-- Order Screen -->
+    <section id="order-screen" class="screen">
+      <h2>Order Menu</h2>
+      <div id="order-summary"></div>
+
+      <div class="order-actions">
+        <button id="add-item-btn">Add Item</button>
+        <button id="add-drink-btn">Add Drink</button>
+        <button id="add-side-btn">Add Side</button>
+        <button id="checkout-btn">Checkout</button>
+        <button id="cancel-order-btn" class="danger">Cancel Order</button>
+      </div>
+    </section>
+
+    <!-- Add Item Screen -->
+    <section id="add-item-screen" class="screen">
+      <h2>Add Item</h2>
+      <form id="item-form">
+
+        <label for="item-type">Select Item Type:</label>
+        <select id="item-type" required></select>
+
+        <label for="item-size">Select Size:</label>
+        <select id="item-size" required>
+          <option value="Small">Small</option>
+          <option value="Medium">Medium</option>
+          <option value="Large">Large</option>
+        </select>
+
+        <fieldset>
+          <legend>Regular Toppings</legend>
+          <div id="regular-toppings"></div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Premium Toppings (extra cost for extras)</legend>
+          <div id="premium-toppings"></div>
+        </fieldset>
+
+        <label for="special-option">Special Option (optional):</label>
+        <input type="text" id="special-option" placeholder="e.g. stuffed crust" />
+
+        <button type="submit">Add Item to Order</button>
+        <button type="button" id="back-to-order-from-item">Back</button>
+      </form>
+    </section>
+
+    <!-- Add Drink Screen -->
+    <section id="add-drink-screen" class="screen">
+      <h2>Add Drink</h2>
+      <form id="drink-form">
+
+        <label for="drink-flavor">Select Drink Flavor:</label>
+        <select id="drink-flavor" required></select>
+
+        <label for="drink-size">Select Drink Size:</label>
+        <select id="drink-size" required>
+          <option value="Small">Small</option>
+          <option value="Medium">Medium</option>
+          <option value="Large">Large</option>
+        </select>
+
+        <button type="submit">Add Drink to Order</button>
+        <button type="button" id="back-to-order-from-drink">Back</button>
+      </form>
+    </section>
+
+    <!-- Add Side Screen -->
+    <section id="add-side-screen" class="screen">
+      <h2>Add Side</h2>
+      <form id="side-form">
+        <label for="side-type">Select Side:</label>
+        <select id="side-type" required></select>
+
+        <button type="submit">Add Side to Order</button>
+        <button type="button" id="back-to-order-from-side">Back</button>
+      </form>
+    </section>
+
+    <!-- Checkout Screen -->
+    <section id="checkout-screen" class="screen">
+      <h2>Checkout</h2>
+      <pre id="checkout-summary"></pre>
+      <button id="confirm-order-btn">Confirm Order</button>
+      <button id="cancel-checkout-btn">Cancel</button>
+    </section>
+
+    <!-- Exit Screen -->
+    <section id="exit-screen" class="screen">
+      <h1>Thank you for visiting Gourmet Bites!</h1>
+    </section>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
