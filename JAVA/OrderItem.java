@@ -1,5 +1,7 @@
 package JAVA;
 
+import java.text.DecimalFormat;
+
 public abstract class OrderItem {
     protected String type;
     protected Drink.Size size;
@@ -18,5 +20,13 @@ public abstract class OrderItem {
 
     public Drink.Size getSize() {
         return size;
+    }
+
+    public DecimalFormat CalculatePrice() {
+        throw new UnsupportedOperationException("Unimplemented method 'CalculatePrice'");
+    }
+
+    public String GetDescription() {
+        throw new UnsupportedOperationException("Unimplemented method 'GetDescription'");
     }
 }

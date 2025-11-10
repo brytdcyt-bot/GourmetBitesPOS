@@ -1,11 +1,11 @@
 package JAVA;
 
-import java.util.Scanner;
+import java.util.*;
 
 public class OrderManager {
     private Order currentOrder;
-    private Menu menu;
-    private Scanner scanner;
+    private final Menu menu;
+    private final Scanner scanner;
 
     public OrderManager(Menu menu) {
         this.menu = menu;
@@ -31,67 +31,43 @@ public class OrderManager {
             String input = scanner.nextLine();
 
             switch (input) {
-                case "1":
-                    addItem();
-                    break;
-                case "2":
-                    addDrink();
-                    break;
-                case "3":
-                    addSide();
-                    break;
-                case "4":
-                    checkout();
-                    return;
-                case "0":
-                    cancelOrder();
-                    return;
-                default:
-                    System.out.println("Invalid option. Try again.");
+                case "1" -> addItem();
+                case "2" -> addDrink();
+                case "3" -> addSide();
+                case "4" -> { checkout(); return; }
+                case "0" -> { cancelOrder(); return; }
+                default -> System.out.println("Invalid option. Try again.");
             }
         }
     }
 
     private void addItem() {
         System.out.println("\nSelect item type:");
-        for (int i = 0; i < menu.getItemTypes().size(); i++) {
-            System.out.printf("%d) %s\n", i + 1, menu.getItemTypes().get(i));
-        }
-        System.out.print("Choice: ");
-        int typeChoice = Integer.parseInt(scanner.nextLine()) - 1;
-        if (typeChoice < 0 || typeChoice >= menu.getItemTypes().size()) {
-            System.out.println("Invalid type selection.");
-            return;
-        }
-        String itemType = menu.getItemTypes().get(typeChoice);
+        List<String> itemTypes = menu.getItemTypes();
+        for (int i = 0; i < itemTypes.size(); i++)
+            System.out.printf("%d) %s%n", i + 1, itemTypes.get(i));
 
-        // Select size
+        int typeChoice = getChoice(itemTypes.size());
+        if (typeChoice == -1) return;
+        String itemType = itemTypes.get(typeChoice);
+
         System.out.println("\nSelect size:");
-        Drink.Size[] sizes = Drink.Size.values();
-        for (int i = 0; i < sizes.length; i++) {
-            System.out.printf("%d) %s\n", i + 1, sizes[i].name());
-        }
-        System.out.print("Choice: ");
-        int sizeChoice = Integer.parseInt(scanner.nextLine()) - 1;
-        if (sizeChoice < 0 || sizeChoice >= sizes.length) {
-            System.out.println("Invalid size selection.");
-            return;
-        }
-        Drink.Size size = sizes[sizeChoice];
+        Size[] sizes = Size.values();
+        for (int i = 0; i < sizes.length; i++)
+            System.out.printf("%d) %s%n", i + 1, sizes[i].name());
+        int sizeChoice = getChoice(sizes.length);
+        if (sizeChoice == -1) return;
 
+        Size size = sizes[sizeChoice];
         double basePrice = menu.getBasePriceForType(itemType);
         CustomItem item = new CustomItem(itemType, size, basePrice);
 
-        // Add toppings
         addToppingsToItem(item);
 
-        // Special option
-        System.out.print("Would you like to add a special option? (yes/no): ");
-        String specialOption = scanner.nextLine().trim().toLowerCase();
-        if (specialOption.equals("yes")) {
-            System.out.print("Enter special option description: ");
-            String option = scanner.nextLine().trim();
-            item.setSpecialOption(option);
+        System.out.print("Add special option? (yes/no): ");
+        if (scanner.nextLine().trim().equalsIgnoreCase("yes")) {
+            System.out.print("Enter description: ");
+            item.setSpecialOption(scanner.nextLine().trim());
         }
 
         currentOrder.addItem(item);
@@ -99,47 +75,42 @@ public class OrderManager {
     }
 
     private void addToppingsToItem(CustomItem item) {
-        // Regular toppings
-        System.out.println("\nAdd Regular Toppings (enter numbers separated by commas, or leave empty):");
-        for (int i = 0; i < menu.getToppingsRegular().size(); i++) {
-            System.out.printf("%d) %s\n", i + 1, menu.getToppingsRegular().get(i));
-        }
+        // Regular
+        System.out.println("\nAdd Regular Toppings:");
+        List<String> regulars = menu.getToppingsRegular();
+        for (int i = 0; i < regulars.size(); i++)
+            System.out.printf("%d) %s%n", i + 1, regulars.get(i));
         System.out.print("Your choices: ");
         String regInput = scanner.nextLine();
-        if (!regInput.trim().isEmpty()) {
-            String[] regIndexes = regInput.split(",");
-            for (String indexStr : regIndexes) {
+        if (!regInput.isEmpty()) {
+            for (String s : regInput.split(",")) {
                 try {
-                    int idx = Integer.parseInt(indexStr.trim()) - 1;
-                    if (idx >= 0 && idx < menu.getToppingsRegular().size()) {
-                        String toppingName = menu.getToppingsRegular().get(idx);
-                        item.addTopping(new Topping(toppingName, Topping.ToppingType.Regular, 0), 1);
-                    }
-                } catch (NumberFormatException ignored) {}
+                    int idx = Integer.parseInt(s.trim()) - 1;
+                    if (idx >= 0 && idx < regulars.size())
+                        item.addTopping(new Topping(regulars.get(idx), Topping.SMALL, 0), 1);
+                } catch (Exception ignored) {}
             }
         }
 
-        // Premium toppings (with quantity)
-        System.out.println("\nAdd Premium Toppings (enter number:quantity separated by commas, or leave empty):");
-        for (int i = 0; i < menu.getToppingsPremium().size(); i++) {
-            String toppingName = menu.getToppingsPremium().get(i);
-            double price = menu.getPremiumToppingPrice(toppingName);
-            System.out.printf("%d) %s ($%.2f for each extra)\n", i + 1, toppingName, price);
+        // Premium
+        System.out.println("\nAdd Premium Toppings:");
+        List<String> premiums = menu.getToppingsPremium();
+        for (int i = 0; i < premiums.size(); i++) {
+            String name = premiums.get(i);
+            double price = menu.getPremiumToppingPrice(name);
+            System.out.printf("%d) %s ($%.2f)%n", i + 1, name, price);
         }
         System.out.print("Your choices (e.g. 1:2,3:1): ");
         String premInput = scanner.nextLine();
-        if (!premInput.trim().isEmpty()) {
-            String[] premParts = premInput.split(",");
-            for (String part : premParts) {
+        if (!premInput.isEmpty()) {
+            for (String p : premInput.split(",")) {
                 try {
-                    String[] pair = part.split(":");
-                    int idx = Integer.parseInt(pair[0].trim()) - 1;
-                    int quantity = Integer.parseInt(pair[1].trim());
-                    if (idx >= 0 && idx < menu.getToppingsPremium().size() && quantity > 0) {
-                        String toppingName = menu.getToppingsPremium().get(idx);
-                        double price = menu.getPremiumToppingPrice(toppingName);
-                        item.addTopping(new Topping(toppingName, Topping.ToppingType.Premium, price), quantity);
-                    }
+                    String[] parts = p.split(":");
+                    int idx = Integer.parseInt(parts[0].trim()) - 1;
+                    int qty = Integer.parseInt(parts[1].trim());
+                    if (idx >= 0 && idx < premiums.size())
+                        item.addTopping(new Topping(premiums.get(idx), ToppingType.PREMIUM,
+                            menu.getPremiumToppingPrice(premiums.get(idx))), qty);
                 } catch (Exception ignored) {}
             }
         }
@@ -147,64 +118,44 @@ public class OrderManager {
 
     private void addDrink() {
         System.out.println("\nSelect drink flavor:");
-        for (int i = 0; i < menu.getDrinkFlavors().size(); i++) {
-            System.out.printf("%d) %s\n", i + 1, menu.getDrinkFlavors().get(i));
-        }
-        System.out.print("Choice: ");
-        int flavorChoice = Integer.parseInt(scanner.nextLine()) - 1;
-        if (flavorChoice < 0 || flavorChoice >= menu.getDrinkFlavors().size()) {
-            System.out.println("Invalid flavor choice.");
-            return;
-        }
-        String flavor = menu.getDrinkFlavors().get(flavorChoice);
+        List<String> flavors = menu.getDrinkFlavors();
+        for (int i = 0; i < flavors.size(); i++)
+            System.out.printf("%d) %s%n", i + 1, flavors.get(i));
+        int flavorChoice = getChoice(flavors.size());
+        if (flavorChoice == -1) return;
 
-        System.out.println("\nSelect drink size:");
-        Drink.Size[] sizes = Drink.Size.values();
-        for (int i = 0; i < sizes.length; i++) {
-            System.out.printf("%d) %s\n", i + 1, sizes[i].name());
-        }
-        System.out.print("Choice: ");
-        int sizeChoice = Integer.parseInt(scanner.nextLine()) - 1;
-        if (sizeChoice < 0 || sizeChoice >= sizes.length) {
-            System.out.println("Invalid size choice.");
-            return;
-        }
-        Drink.Size size = sizes[sizeChoice];
+        System.out.println("\nSelect size:");
+        Size[] sizes = Size.values();
+        for (int i = 0; i < sizes.length; i++)
+            System.out.printf("%d) %s%n", i + 1, sizes[i].name());
+        int sizeChoice = getChoice(sizes.length);
+        if (sizeChoice == -1) return;
 
-        // Base drink price could be fixed or variable, here fixed at 2.00
-        Drink drink = new Drink(flavor, size, 2.00);
-        currentOrder.addDrink(drink);
+        currentOrder.addDrink(new Drink(flavors.get(flavorChoice), sizes[sizeChoice], 2.00));
         System.out.println("Drink added to order.");
     }
 
     private void addSide() {
         System.out.println("\nSelect side:");
         List<Side> sides = menu.getSides();
-        for (int i = 0; i < sides.size(); i++) {
-            Side side = sides.get(i);
-            System.out.printf("%d) %s ($%.2f)\n", i + 1, side.getName(), side.getPrice());
-        }
-        System.out.print("Choice: ");
-        int sideChoice = Integer.parseInt(scanner.nextLine()) - 1;
-        if (sideChoice < 0 || sideChoice >= sides.size()) {
-            System.out.println("Invalid side choice.");
-            return;
-        }
-        Side selectedSide = sides.get(sideChoice);
-        currentOrder.addSide(selectedSide);
+        for (int i = 0; i < sides.size(); i++)
+            System.out.printf("%d) %s ($%.2f)%n", i + 1, sides.get(i).getName(), sides.get(i).getPrice());
+        int sideChoice = getChoice(sides.size());
+        if (sideChoice == -1) return;
+
+        currentOrder.addSide(sides.get(sideChoice));
         System.out.println("Side added to order.");
     }
 
     private void checkout() {
         System.out.println("\n--- Checkout ---");
         if (!currentOrder.isValidOrder()) {
-            System.out.println("Order must contain at least one item, or a drink/side.");
+            System.out.println("Order must contain at least one item, drink, or side.");
             return;
         }
         System.out.println(currentOrder.getOrderDetails());
-        System.out.println("Confirm order? (yes/no)");
-        String confirm = scanner.nextLine().trim().toLowerCase();
-        if (confirm.equals("yes")) {
+        System.out.print("Confirm order? (yes/no): ");
+        if (scanner.nextLine().trim().equalsIgnoreCase("yes")) {
             try {
                 currentOrder.saveReceipt();
                 System.out.println("Order confirmed! Receipt saved.");
@@ -225,30 +176,24 @@ public class OrderManager {
 
     private void displayCurrentOrderSummary() {
         System.out.println("\nCurrent Order Summary:");
-        if (currentOrder.getItems().isEmpty() && currentOrder.getDrinks().isEmpty() && currentOrder.getSides().isEmpty()) {
+        if (currentOrder.isEmpty()) {
             System.out.println("No items in order.");
             return;
         }
 
-        if (!currentOrder.getItems().isEmpty()) {
-            System.out.println("Items:");
-            for (OrderItem item : currentOrder.getItems()) {
-                System.out.println("- " + item.getDescription());
-            }
-        }
-        if (!currentOrder.getDrinks().isEmpty()) {
-            System.out.println("Drinks:");
-            for (Drink drink : currentOrder.getDrinks()) {
-                System.out.println("- " + drink.getDescription());
-            }
-        }
-        if (!currentOrder.getSides().isEmpty()) {
-            System.out.println("Sides:");
-            for (Side side : currentOrder.getSides()) {
-                System.out.println("- " + side.getDescription());
-            }
-        }
+        currentOrder.getItems().forEach(i -> System.out.println("- " + i.getDescription()));
+        currentOrder.getDrinks().forEach(d -> System.out.println("- " + d.getDescription()));
+        currentOrder.getSides().forEach(s -> System.out.println("- " + s.getDescription()));
 
-        System.out.printf("Current Total: $%.2f\n", currentOrder.calculateTotal());
+        System.out.printf("Current Total: $%.2f%n", currentOrder.calculateTotal());
+    }
+
+    private int getChoice(int max) {
+        try {
+            int val = Integer.parseInt(scanner.nextLine().trim());
+            return (val < 1 || val > max) ? -1 : val - 1;
+        } catch (NumberFormatException e) {
+            return -1;
+        }
     }
 }
